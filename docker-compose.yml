@@ -1,0 +1,32 @@
+version: '3'
+services:
+  nginx:
+    container_name: lisbeth-nginx
+    image: registry.gitlab.com/idrilsilverfoot/lisbeth-infra/nginx
+    build: ./nginx/
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+    networks:
+      - backend
+    restart: always
+  cheatd:
+    container_name: cheatd
+    image: registry.gitlab.com/idrilsilverfoot/lisbeth-infra/cheatd
+    build: ./cheatd/
+    networks:
+      - backend
+    expose:
+      - 8080
+    logging:
+      driver: syslog
+      options:
+        tag: cheatd
+    depends_on:
+      - nginx
+    restart: always
+networks:
+  backend:
+    driver: bridge
